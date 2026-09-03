@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Pytest
+.pytest_cache/
+
+# Local uploaded files
+storage/
+
+# macOS
+.DS_Store

@@ -1,0 +1,67 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.db import get_db
+from app.models import Document, DocumentChunk, DocumentStatus
+from app.schema import IngestionRequest
+from app.storage.local import LocalStorage
+from app.ingestion.parser import PDFParser
+from app.ingestion.chunker import TextChunker
+from app.ingestion.embedder import Embedder
+
+router = APIRouter(
+    prefix="/ingestion",
+    tags=["ingestion"],
+)
+
+storage = LocalStorage()
+parser = PDFParser()
+chunker = TextChunker()
+embedder = Embedder()
+
+
+@router.post("/ingest")
+async def ingest_document(request: IngestionRequest, db: Session = Depends(get_db),):
+    document = Document(
+        tenant_id=request.tenant_id,
+        filename=request.filename,
+        status=DocumentStatus.PROCESSING,
+        storage_key=request.storage_key,
+        document_metadata=request.metadata,
+    )
+    db.add(document)
+    db.commit()
+    db.refresh(document)
+    try:
+        # 1. Read + parse document
+        file_path = storage.base_path / request.storage_key
+        text = parser.parse(str(file_path))
+        # 2. Chunk
+        chunks = chunker.chunk(text)
+        # 3. Generate embeddings + persist chunks
+        for index, chunk_text in enumerate(chunks):
+            embedding = embedder.embed(chunk_text)
+            chunk = DocumentChunk(
+                document_id=document.id,
+                chunk_index=index,
+                content=chunk_text,
+                embedding=embedding,
+                document_metadata={},
+            )
+            db.add(chunk)
+        # 4. Mark document completed
+        document.status = DocumentStatus.COMPLETED
+        db.commit()
+        return {
+            "document_id": document.id,
+            "status": document.status,
+            "chunks_created": len(chunks),
+        }
+
+    except Exception as e:
+        db.rollback()
+        document.status = DocumentStatus.FAILED
+        document.error = str(e)
+        db.add(document)
+        db.commit()
+        raise
