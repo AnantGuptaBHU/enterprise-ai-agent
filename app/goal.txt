@@ -1,0 +1,83 @@
+PHASE 1 — CORE AGENT
+1. Real Gemini integration
+2. Tool calling
+3. Tool execution
+4. Agent loop
+5. Conversation/context
+6. Agent state
+7. Structured responses
+
+PHASE 2 — EXECUTION ENGINE
+8. Execution model
+9. Step/tool execution model
+10. Execution persistence
+11. Execution lifecycle
+12. Execution history
+
+PHASE 3 — RELIABILITY
+13. Tool timeouts
+14. Retry
+15. Retry classification
+16. Idempotency
+17. Circuit breaker
+18. Execution timeout
+19. Cancellation
+
+PHASE 4 — DISTRIBUTED EXECUTION
+20. Async API
+21. Redis
+22. Queue
+23. Worker
+24. ACK/NACK
+25. Retry queue
+26. DLQ
+27. Worker concurrency
+28. Crash recovery
+29. Resume execution
+
+PHASE 5 — RAG
+30. Final answer generation
+31. RAG evaluation
+32. RAG regression tests
+
+PHASE 6 — MCP
+33. MCP architecture
+34. MCP server
+35. MCP tools
+36. MCP resources
+37. MCP client
+38. Agent + MCP integration
+
+PHASE 7 — OBSERVABILITY
+39. Structured logging
+40. Execution IDs
+41. Metrics
+42. LLM/tool latency
+43. Token tracking
+44. Distributed tracing
+45. Failure monitoring
+
+PHASE 8 — MULTI-AGENT
+46. Why multi-agent
+47. Supervisor
+48. Routing
+49. Specialist agents
+50. Agent handoff
+51. Shared state
+52. Multi-agent failure handling
+
+PHASE 9 — EVALUATION
+53. Agent evaluation
+54. Tool selection evaluation
+55. Final answer evaluation
+56. Regression suite
+57. RAG evaluation integration
+
+PHASE 10 — PRODUCTION
+58. Alembic
+59. Docker
+60. Configuration
+61. Health checks
+62. Graceful shutdown
+63. CI/CD
+64. Production deployment

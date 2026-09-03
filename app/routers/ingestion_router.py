@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-
+from sqlalchemy import func
 from app.db import get_db
 from app.models import Document, DocumentChunk, DocumentStatus
 from app.schema import IngestionRequest
@@ -46,7 +46,8 @@ async def ingest_document(request: IngestionRequest, db: Session = Depends(get_d
                 chunk_index=index,
                 content=chunk_text,
                 embedding=embedding,
-                document_metadata={},
+                search_vector=func.to_tsvector("english", chunk_text),
+                document_metadataa=request.metadata,
             )
             db.add(chunk)
         # 4. Mark document completed
