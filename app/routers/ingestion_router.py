@@ -40,7 +40,7 @@ async def ingest_document(request: IngestionRequest, db: Session = Depends(get_d
         chunks = chunker.chunk(text)
         # 3. Generate embeddings + persist chunks
         for index, chunk_text in enumerate(chunks):
-            embedding = embedder.embed(chunk_text)
+            embedding = embedder.embed_document(chunk_text)
             chunk = DocumentChunk(
                 document_id=document.id,
                 chunk_index=index,

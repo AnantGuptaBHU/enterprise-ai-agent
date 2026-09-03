@@ -1,17 +1,23 @@
 from app.rag.retrieval.dense_retriever import DenseRetriever
 from app.rag.retrieval.sparse_retriever import SparseRetriever
+from app.rag.retrieval.reranker import Reranker
 from sqlalchemy.orm import Session
 
 class Retriever:
     def __init__(self, db: Session):
         self.dense = DenseRetriever(db)
         self.sparse = SparseRetriever(db)
+        self.reranker = Reranker()
 
-    def search(self, tenant_id: str, query: str, query_embedding: list[float], top_k: int = 5, distance_threshold: float | None = None, metadata_filters: dict | None = None,):
-        dense_results = self.dense.search(tenant_id=tenant_id, query_embedding=query_embedding, top_k=top_k, distance_threshold=distance_threshold, metadata_filters=metadata_filters)
-        sparse_results = self.sparse.search(tenant_id=tenant_id, query=query, top_k=top_k, metadata_filters=metadata_filters)
-        return self._rrf(dense_results, sparse_results, top_k)
-    
+    def search(self, tenant_id: str, query: str, query_embedding: list[float], top_k: int = 3, candidate_k: int = 5, distance_threshold: float | None = None, metadata_filters: dict | None = None,):
+        dense_results = self.dense.search(tenant_id=tenant_id, query_embedding=query_embedding, top_k=candidate_k, distance_threshold=distance_threshold, metadata_filters=metadata_filters)
+        sparse_results = self.sparse.search(tenant_id=tenant_id, query=query, top_k=candidate_k, metadata_filters=metadata_filters)
+        candidates = self._rrf(dense_results, sparse_results, candidate_k)
+        return self.reranker.rerank(
+            query=query,
+            results=candidates,
+            top_k=top_k,
+        )
     def _rrf(self, dense_results: list[dict], sparse_results: list[dict], top_k: int, k: int = 60):
         scores = {}
         chunks = {}

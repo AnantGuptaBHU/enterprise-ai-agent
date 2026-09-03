@@ -12,7 +12,7 @@ class Generator:
 
     def generate(self, user_input: str, tenant_id: str, top_k: int = 5) -> str:
 
-        query_embedding = self.embedder.embed(user_input)
+        query_embedding = self.embedder.embed_query(user_input)
 
         results = self.retriever.search(
             tenant_id=tenant_id,
