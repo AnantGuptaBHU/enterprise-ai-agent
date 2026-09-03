@@ -31,7 +31,6 @@ class Document(Base):
     error = Column(String, nullable = True)
     created_at = Column(DateTime, server_default = func.now(), nullable = False)
     updated_at = Column(DateTime, server_default = func.now(), onupdate=func.now(), nullable = False)
-
     document_chunks = relationship("DocumentChunk", back_populates="document")
 
 
@@ -46,3 +45,28 @@ class DocumentChunk(Base):
     document_metadata = Column(JSON)
     created_at = Column(DateTime, server_default = func.now(), nullable = False)
     document = relationship("Document", back_populates="document_chunks")
+
+class Role(str, pyEnum):
+    USER = "USER"
+    ASSISTANT = "ASSISTANT"
+    TOOL = "TOOL"
+
+class Conversation(Base):
+    __tablename__ = "conversations"
+    id = Column(Integer, primary_key = True)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    created_at = Column(DateTime, server_default = func.now(), nullable = False)
+    updated_at = Column(DateTime, server_default = func.now(), onupdate=func.now(), nullable = False)
+    messages = relationship("Message", back_populates="conversation")
+
+class Message(Base):
+    __tablename__ = "messages"
+    id = Column(Integer, primary_key = True)
+    conversation_id = Column(Integer, ForeignKey(Conversation.id), nullable = False, index=True)
+    role = Column(sqlEnum(Role), nullable = False)
+    content = Column(String)
+    tool_call_id = Column(String, nullable=True)
+    tool_name = Column(String)
+    tool_arguments = Column(JSON)
+    created_at = Column(DateTime, server_default = func.now(), nullable = False)
+    conversation = relationship("Conversation", back_populates="messages")

@@ -5,7 +5,8 @@ from app.models import User, Document, DocumentChunk
 
 from app.routers.document_router import router as document_router
 from app.routers.ingestion_router import router as ingestion_router
-
+from app.routers.chat_router import router as chat_router
+from app.routers.admin_router import router as admin_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,3 +20,5 @@ def health():
 
 app.include_router(document_router)
 app.include_router(ingestion_router)
+app.include_router(chat_router)
+app.include_router(admin_router)

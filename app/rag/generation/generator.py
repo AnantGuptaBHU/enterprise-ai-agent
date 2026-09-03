@@ -22,4 +22,5 @@ class Generator:
             distance_threshold=0.4,
         )
         context = self.context_builder.build(results)
+        print("context is ----- ",context)
         return context

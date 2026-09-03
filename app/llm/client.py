@@ -9,12 +9,7 @@ load_dotenv()
 
 class LLMResponse:
 
-    def __init__(
-        self,
-        text=None,
-        tool_calls=None,
-        message=None,
-    ):
+    def __init__(self,text=None,tool_calls=None,message=None):
         self.text = text
         self.tool_calls = tool_calls or []
         self.message = message
@@ -36,13 +31,24 @@ class LLMClient:
                 automatic_function_calling = types.AutomaticFunctionCallingConfig(disable = True)
             )
         )
+    def _normalize_response(self, response) -> LLMResponse:
+        return LLMResponse(
+            text=response.text,
+            tool_calls=response.function_calls or [],
+            message=response.candidates[0].content,
+        )
 
     def generate(self, prompt: str) -> LLMResponse:
-        # response = self.chat.send_message(prompt)
-        # tool_calls = response.function_calls or []
+        response = self.chat.send_message(prompt)
+        print(
+            f"[LLMClient] Gemini | "
+            f"text={response.text if response.function_calls is None else None} | "
+            f"tools={response.function_calls}"
+        )
+
         # return LLMResponse(
-        #     text=response.text,
-        #     tool_calls=tool_calls,
+        #     text=response.text if not response.function_calls else None,
+        #     tool_calls=response.function_calls or [],
         #     message=response.candidates[0].content,
         # )
         return LLMResponse(
@@ -58,25 +64,33 @@ class LLMClient:
         )
 
     def send_tool_results(self, tool_calls, results):
+        function_responses = []
 
-        # function_responses = []
+        for tool_call, result in zip(tool_calls, results):
 
-        # for function_call, result in zip(tool_calls, results):
+            function_responses.append(
+                types.Part.from_function_response(
+                    name=tool_call.name,
+                    response={
+                        "result": result
+                    },
+                )
+            )
 
-        #     function_responses.append(
-        #         types.Part.from_function_response(
-        #             name=function_call.name,
-        #             response={
-        #                 "result": result
-        #             },
-        #         )
-        #     )
+        response = self.chat.send_message(function_responses)
 
-        # response = self.chat.send_message(
-        #     function_responses
+        print(
+            f"[LLMClient] Gemini after tool | "
+            f"text={response.text if response.function_calls is None else None} | "
+            f"tools={response.function_calls}"
+        )
+
+        # return LLMResponse(
+        #     text=response.text if not response.function_calls else None,
+        #     tool_calls=response.function_calls or [],
+        #     message=response.candidates[0].content,
         # )
-
-        # return self._normalize_response(response)
+    
         return LLMResponse(
             text=f"The result is {results[0]}."
         )
