@@ -5,9 +5,9 @@ from app.db import get_db
 from app.models import Document, DocumentChunk, DocumentStatus
 from app.schema import IngestionRequest
 from app.storage.local import LocalStorage
-from app.ingestion.parser import PDFParser
-from app.ingestion.chunker import TextChunker
-from app.ingestion.embedder import Embedder
+from app.rag.ingestion.parser import PDFParser
+from app.rag.ingestion.chunker import TextChunker
+from app.rag.ingestion.embedder import Embedder
 
 router = APIRouter(
     prefix="/ingestion",

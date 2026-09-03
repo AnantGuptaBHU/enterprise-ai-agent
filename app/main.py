@@ -11,8 +11,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Enterprise AI Agent")
 
 tool_registry = create_tool_registry()
-# agent = Agent()
-# print(agent.run("please mail me the result of 6+7 at anant.vara@gmail.com"))
+agent = Agent()
+print(agent.run("please mail me the result of 6+7 at anant.vara@gmail.com"))
 
 @app.get("/health")
 def health():

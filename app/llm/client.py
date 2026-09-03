@@ -48,11 +48,10 @@ class LLMClient:
         return LLMResponse(
             tool_calls=[
                 types.FunctionCall(
-                    name="unknown_tool",
+                    name="search_knowledge_base",
                     args={
-                        "a": 6,
-                        "b": 7,
-                        "operation": "add",
+                        "query": "What is the warranty period?",
+                        "tenant_id": "tenant-001",
                     },
                 )
             ]

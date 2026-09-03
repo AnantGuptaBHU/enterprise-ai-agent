@@ -1,22 +1,31 @@
 from pydantic import BaseModel
 
+from app.db import SessionLocal
+from app.rag.generation.generator import Generator
+from app.rag.ingestion.embedder import Embedder
+from app.rag.retrieval.retriever import Retriever
+from app.rag.generation.context_builder import ContextBuilder
+
 
 class KnowledgeBaseInput(BaseModel):
     query: str
+    tenant_id: str
 
 
-def search_knowledge_base(query: str):
+def search_knowledge_base(query: str, tenant_id: str):
+    db = SessionLocal()
 
-    return {
-        "query": query,
-        "results": [
-            {
-                "title": "Refund Policy",
-                "content": "Customers can request a refund within 30 days."
-            },
-            {
-                "title": "Support Policy",
-                "content": "Customer support is available Monday to Friday."
-            }
-        ]
-    }
+    try:
+        generator = Generator(
+            embedder=Embedder(),
+            retriever=Retriever(db),
+            context_builder=ContextBuilder(),
+        )
+
+        return generator.generate(
+            user_input=query,
+            tenant_id=tenant_id,
+        )
+
+    finally:
+        db.close()

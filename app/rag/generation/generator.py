@@ -16,8 +16,10 @@ class Generator:
 
         results = self.retriever.search(
             tenant_id=tenant_id,
+            query=user_input,
             query_embedding=query_embedding,
             top_k=top_k,
+            distance_threshold=0.4,
         )
         context = self.context_builder.build(results)
         return context

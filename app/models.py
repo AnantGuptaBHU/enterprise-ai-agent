@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 from enum import Enum as pyEnum
 from sqlalchemy.sql import func
 from pgvector.sqlalchemy import Vector
+from sqlalchemy.dialects.postgresql import TSVECTOR
+
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key = True)
@@ -40,6 +42,7 @@ class DocumentChunk(Base):
     chunk_index = Column(Integer, nullable = False)
     content = Column(String)
     embedding = Column(Vector(3072), nullable=False)
+    search_vector = Column(TSVECTOR)
     document_metadata = Column(JSON)
     created_at = Column(DateTime, server_default = func.now(), nullable = False)
     document = relationship("Document", back_populates="document_chunks")
