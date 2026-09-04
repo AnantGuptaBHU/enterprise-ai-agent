@@ -13,8 +13,8 @@ class AgentLoop:
         self.message_store = message_store
         self.max_iterations = max_iterations
 
-    def run(self, user_input: str, conversation_id: int):
-        state = AgentState(user_input=user_input)
+    def run(self, user_input: str, conversation_id: int | None = None):
+        state = AgentState(user_input = user_input, conversation_id = conversation_id)
 
         try:
             response = self.llm_client.generate(user_input)
@@ -37,13 +37,7 @@ class AgentLoop:
                 results = []
 
                 for function_call in tool_calls:
-                    self.message_store.save_message(
-                        conversation_id=conversation_id,
-                        role=Role.ASSISTANT,
-                        tool_call_id=function_call.id,
-                        tool_name=function_call.name,
-                        tool_arguments=function_call.args,
-                    )
+
                     tool_signature = (
                         function_call.name,
                         str(function_call.args)
@@ -57,19 +51,31 @@ class AgentLoop:
 
                     tool_history.add(tool_signature)
 
+                    if conversation_id is not None:
+                        self.message_store.save_message(
+                            conversation_id=conversation_id,
+                            role=Role.ASSISTANT,
+                            tool_call_id=function_call.id,
+                            tool_name=function_call.name,
+                            tool_arguments=function_call.args,
+                        )
+
                     print(f"Tool requested: {function_call.name}")
                     print(f"Arguments: {function_call.args}")
 
                     result = self.tool_executor.execute(function_call)
-                    self.message_store.save_message(
-                        conversation_id=conversation_id,
-                        role=Role.TOOL,
-                        content=str(result),
-                        tool_call_id=function_call.id,
-                        tool_name=function_call.name,
-                    )
+
+                    if conversation_id is not None:
+                        self.message_store.save_message(
+                            conversation_id=conversation_id,
+                            role=Role.TOOL,
+                            content=str(result),
+                            tool_call_id=function_call.id,
+                            tool_name=function_call.name,
+                        )
 
                     print(f"Tool result: {result}")
+
                     results.append(result)
 
                 state.tool_results.extend(results)

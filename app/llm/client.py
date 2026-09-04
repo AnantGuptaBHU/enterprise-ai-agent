@@ -77,13 +77,13 @@ class LLMClient:
                 )
             )
 
-        response = self.chat.send_message(function_responses)
+        # response = self.chat.send_message(function_responses)
 
-        print(
-            f"[LLMClient] Gemini after tool | "
-            f"text={response.text if response.function_calls is None else None} | "
-            f"tools={response.function_calls}"
-        )
+        # print(
+        #     f"[LLMClient] Gemini after tool | "
+        #     f"text={response.text if response.function_calls is None else None} | "
+        #     f"tools={response.function_calls}"
+        # )
 
         # return LLMResponse(
         #     text=response.text if not response.function_calls else None,

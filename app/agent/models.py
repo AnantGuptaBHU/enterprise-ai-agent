@@ -5,6 +5,7 @@ from typing import Any
 @dataclass
 class AgentState:
     user_input: str
+    conversation_id: int | None = None
     iteration: int = 0
     status: str = "running"
     tool_calls: list[Any] = field(default_factory=list)

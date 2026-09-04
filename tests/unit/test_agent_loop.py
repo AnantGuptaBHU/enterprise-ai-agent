@@ -40,6 +40,14 @@ class FakeFunctionCall:
         self.name = name
         self.args = args
 
+class FakeMessageStore:
+
+    def __init__(self):
+        self.messages = []
+
+    def save_message(self, **kwargs):
+        self.messages.append(kwargs)
+
 
 @pytest.fixture
 def executor():
@@ -72,6 +80,7 @@ def test_agent_loop_tool_execution(executor):
     loop = AgentLoop(
         llm_client=llm,
         tool_executor=executor,
+        message_store=FakeMessageStore(),
     )
 
     result = loop.run("What is 2 + 3?")
@@ -89,6 +98,7 @@ def test_agent_loop_direct_response(executor):
     loop = AgentLoop(
         llm_client=llm,
         tool_executor=executor,
+        message_store=FakeMessageStore(),
     )
 
     result = loop.run("Hello")
@@ -111,6 +121,7 @@ def test_agent_loop_unknown_tool(executor):
     loop = AgentLoop(
         llm_client=llm,
         tool_executor=executor,
+        message_store=FakeMessageStore(),
     )
 
     result = loop.run("Do something")
@@ -134,6 +145,7 @@ def test_agent_loop_repeated_tool_call(executor):
     loop = AgentLoop(
         llm_client=llm,
         tool_executor=executor,
+        message_store=FakeMessageStore(),
     )
 
     result = loop.run("What is 2 + 3?")
@@ -167,6 +179,7 @@ def test_agent_loop_max_iterations(executor):
         llm_client=llm,
         tool_executor=executor,
         max_iterations=2,
+        message_store=FakeMessageStore(),
     )
 
     result = loop.run("Keep calculating")
